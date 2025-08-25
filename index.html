@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Happy Birthday Bebep</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#fdf4f6; /* soft pink */
+      --bg2:#fff;     /* card */
+      --ink:#2b2b2b;  /* text */
+      --accent:#ff6b8a; /* pink */
+      --accent-2:#7c3aed; /* purple */
+      --soft:#ffe4ec; /* light */
+      --ring: rgba(255,107,138,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background: radial-gradient(1200px 800px at 20% 10%, #fff 0%, var(--bg1) 60%, #fdecef 100%);
+      color:var(--ink); font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji','Segoe UI Emoji';
+      overflow-x:hidden;
+    }
+
+    /* Floating hearts background */
+    .hearts{position:fixed; inset:0; pointer-events:none; z-index:0}
+    .heart{position:absolute; width:14px; height:14px; transform:rotate(45deg); background:var(--accent); opacity:.28; animation:float 10s linear infinite; border-radius:2px}
+    .heart::before,.heart::after{content:""; position:absolute; width:14px; height:14px; background:var(--accent); border-radius:50%}
+    .heart::before{left:-7px}
+    .heart::after{top:-7px}
+    @keyframes float{ 
+      0%{ transform:translateY(0) rotate(45deg) scale(.8); opacity:.0 }
+      10%{ opacity:.25 }
+      100%{ transform:translateY(-110vh) rotate(45deg) scale(1.1); opacity:0 }
+    }
+
+    header{
+      position:relative; z-index:2; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:18px;
+      padding:64px 16px 24px;
+      text-align:center;
+    }
+    .title{
+      font-family:'Playfair Display', serif; font-weight:700; font-size: clamp(32px, 5vw, 56px);
+      letter-spacing: .3px; color:#1f1726;
+    }
+    .subtitle{opacity:.8; max-width:840px; font-size:clamp(14px, 2.2vw, 18px)}
+
+    .card{
+      position:relative; z-index:2; margin:0 auto; width:min(980px, 92vw);
+      background:linear-gradient(180deg, #fff, var(--bg2)); border-radius:28px; box-shadow:0 20px 60px rgba(124,58,237,.18), 0 10px 30px rgba(255,107,138,.12);
+      padding:28px; border:1px solid rgba(124,58,237,.08);
+    }
+
+    .gate{
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:32px; text-align:center;
+    }
+    .open-btn{
+      --btn:var(--accent);
+      border:none; background: radial-gradient(120% 120% at 30% 20%, #ffafc2 0%, var(--accent) 40%, #db3d61 100%);
+      color:#fff; padding:16px 28px; font-size:18px; border-radius:999px; cursor:pointer; font-weight:700; letter-spacing:.3px;
+      box-shadow: 0 10px 24px rgba(255, 107, 138, .35); transform:translateY(0); transition: transform .15s ease, box-shadow .15s ease, filter .2s ease;
+    }
+    .open-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(255, 107, 138, .42); filter:saturate(1.05)}
+
+    /* Letter modal */
+    dialog#letter{
+      width:min(920px,92vw); max-height:82vh; border:none; border-radius:24px; padding:0; background:#fff; box-shadow:0 30px 100px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    dialog::backdrop{ backdrop-filter: blur(6px); background:rgba(0,0,0,.22) }
+    .modal-head{
+      display:flex; align-items:center; gap:12px; justify-content:space-between; padding:16px 18px; border-bottom:1px solid rgba(0,0,0,.06); background:linear-gradient(180deg,#fff,#fff8fb);
+    }
+    .modal-title{ font-weight:700; letter-spacing:.3px }
+    .x{ border:none; background:#fff; border-radius:10px; padding:8px 10px; cursor:pointer; font-weight:700 }
+    .modal-body{ padding:0 20px 20px; overflow:auto; max-height:calc(82vh - 64px) }
+
+    .letter{
+      padding:18px 8px 36px; line-height:1.72; font-size:17px;
+      column-width: 540px; column-gap: 40px; column-fill: auto; /* graceful on wide screens */
+    }
+    .letter p{ margin:0 0 16px }
+    .letter .hi{ font-family:'Playfair Display', serif; font-size:clamp(28px, 3vw, 36px); margin:0 0 16px; line-height:1.3 }
+    .signature{ margin-top:26px; font-style:italic }
+
+    /* Typewriter for subtitle */
+    .type{ display:inline-block; border-right:2px solid var(--accent); white-space:nowrap; overflow:hidden; animation: caret 1s step-end infinite }
+    @keyframes caret{ 50%{ border-color:transparent } }
+
+    /* Confetti canvas */
+    canvas#fx{ position:fixed; inset:0; pointer-events:none; z-index:10 }
+
+    footer{ text-align:center; opacity:.7; padding:24px 10px; font-size:13px }
+  </style>
+</head>
+<body>
+  <div class="hearts" aria-hidden="true" id="hearts"></div>
+  <canvas id="fx" width="0" height="0"></canvas>
+
+  <header>
+    <div class="title">Happy Birthday To My Lovely Girlfriend</div>
+    <div class="subtitle">
+      <span id="type" class="type" aria-live="polite"></span>
+    </div>
+  </header>
+
+  <main class="card">
+    <section class="gate">
+      <p style="margin:0; opacity:.8">Ada surat manis dari <strong>Aku</strong> buat <strong>Bebep</strong> 🎀</p>
+      <div class="controls">
+        <button class="open-btn" id="open">Buka Surat 🎁</button>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="letter">
+    <div class="modal-head">
+      <div class="modal-title">Selamat Ulang Tahun, Rahmi! 🫶</div>
+      <button class="x" id="close" aria-label="Tutup">✕</button>
+    </div>
+    <div class="modal-body">
+      <article class="letter" id="letter-content">
+        <!-- isi suratmu tetap sama -->
+        <p class="hi">Selamat bertambah umur, manusia favoritku Rahmi Hidayati Daulati Sauroh.</p>
+        <p>Sebelumnya maaf kalau aku kurang pandai dalam merangkai kata-kata. Tadinya pengen nulis tangan, tapi khawatir tulisanku jelek dan bikin kamu pusing bacanya, hahaha. Maksud hati ingin nyampein doa dan perasaan, tapi kalau nggak kebaca kan jadi kurang tersampaikan dengan baik, hehe.</p>
+        <p>Hari ini, <strong>26 Agustus 2025</strong>, jadi hari yang paling aku syukuri kepada Allah. Karena-Nya, kamu diberikan nikmat panjang umur, sampai di usia 25 tahun ini. Alhamdulillah ❤️</p>
+        <p>Aku pengen cerita sedikit walau beberapa udah pernah aku ceritain ke kamu.</p>
+        <p>Sebelum aku kenal kamu, aku sering minta sama Allah: aku butuh pasangan hidup, tempat aku berlabuh, rumah untuk pulang. Aku minta dikasih pasangan yang bisa bikin aku semakin dekat dengan Allah; yang mengingatkan aku untuk selalu taat pada perintah-Nya; yang mengajariku bahwa menjalani hubungan bukan hanya sekadar hasrat untuk memiliki, tapi juga ibadah dan melengkapi perintah-Nya. Aku sadar aku sendiri masih banyak kurangnya, tapi banyak maunya, hehe.</p>
+        <p>Dalam perjalanannya, aku beberapa kali dihadapkan dengan masa lalu yang membuatku ragu untuk memilih pasangan. Beberapa sosok di masa lalu justru bikin aku merasa harus berubah jadi orang lain, dan itu nggak nyaman untukku.</p>
+        <p>Mungkin perlu aku ungkapkan meski sulit dan pahit. Jika diizinkan mengakui sesuatu, aku ingin jujur sama kamu. Beberapa drama yang sengaja aku buat sebelumnya yang mungkin bikin kamu kurang nyaman sebenarnya adalah caraku untuk tahu: <em>“Bisakah aku tetap jadi diriku sendiri di hadapan kamu?”</em></p>
+        <p>Dengan aku yang suka mempermasalahkan kalau kamu balas chat singkat atau lama (karena aku yang sebelumnya SPJ dan bales chatnya nggak selalu cepet). Dengan aku yang sering minta ketemu (karena sebelumnya aku tipe ketemu kalau perlu). Dengan aku yang sengaja bikin drama (padahal dulu aku paling heran sama drama-dramaan). Dan banyak lagi, sejujurnya ✌️😄! Tapi semua itu kulakukan hanya karena ingin memastikan: bisakah aku benar-benar nyaman sama kamu, dan kamu pun nyaman sama aku.</p>
+        <p>Dengan sekian doa yang kupanjatkan dan istikharah yang kujalanin, insyaa Allah hadirnya kamu di hidupku jadi jawabannya. Setelah pengakuan ini, aku mau minta maaf kalau kesannya kayak aku “ngetes” kamu. Sejujurnya ini langkah penting bagiku untuk memilih pasangan hidup. Semoga kamu ngertiin yaa.</p>
+        <p>Dan yang terpenting, bep <em>today is your day, my lovely 🥰</em> <br> I am always proud and amazed of you.</p> 
+        <p>Di saat aku atau teman-temanmu libur di hari Sabtu dan Minggu, kamu masih kerja. Walau capek, kamu tetap jalanin. <br>Di saat kamu sakit, kamu tetap berusaha kuat dan tetap gas berangkat kerja (padahal aku khawatir banget tau, bep 😭 ).
+        <br>Di saat yang lain mengeluh dengan kekurangannya misal soal gaji kamu tetap merasa lebih dari cukup dan bersyukur. <br>Di saat perempuan lain banyak maunya ini-itu, kamu itu sederhana dan nggak mau ngerepotin (padahal aku seneng kalau direpotin sama kamu). <br>Di saat aku ada-ada aja dramanya, kamu tetap sabar dan selalu ngerti nyamannya aku seperti apa. Aku juga berusaha bikin kamu selalu nyaman, bep. </p>
+        <p>Dan masih banyak lagi dari sosok Rahmi Hidayati Daulati Sauroh yang MasyaaAllah selalu bisa bikin aku bangga dan kagum sama kamu.</p>
+        <p>Doaku akan selalu sama di setiap solatku: semoga kamu, aku, keluargamu, dan keluargaku selalu disertai oleh Keridhoan-Nya, Kemurahan-Nya, Kasih Sayang-Nya, Perlindungan-Nya, Kekuatan-Nya, Kesehatan-Nya, Kelimpahan-Nya, dan Kemudahan-Nya.</p>
+        <p>Oh iya, kamu jarang banget ngutarain kalau lagi pengen apa, jadi kadang aku inisiatif aja nyamperin kamu ke apotek. Maaf ya suka gangguin kamu kerja kalau aku random tiba-tiba udah ada di apotek, hehe ✌️😄. Dan maaf kalau kado yang aku kasih bukan barang mewah, nggak sebanyak yang pernah kamu kasih ke aku, atau sesuatu yang lagi kamu pengenin.</p>
+        <p>Jujur, waktu ulang tahunku kemarin, kado dan ucapan darimu itu pertama kalinya aku dapat kado dari seorang perempuan selain keluargaku bikin aku mellow dan terharu 😭. Dan ini juga pertama kalinya aku ngasih kado ke seorang wanita, apalagi wanita pujaan hati… Hey, Pujaan Hati, apa kabarmu? Kuharap kau baik-baik saja, Pujaan Hati… lah jadi nyanyi Kangen Band, hahaha.</p>
+        <p>Tapi yang lebih relate sih lagunya Pamungkas judulnya <em>“I Love About You”</em> kang ngamen izin nyanyi bentar:</p>
+        <p><em>You came like song<br>One I'd sing along<br>I love about you<br>You smell like summer<br>Something watery<br>I love about you<br>And in the sun<br>We're holdin' each other's hands<br>And I see you<br>You see me<br>I thought it was so cool<br>I love about you<br>Everything you do</em></p>
+        <p>Sekian, maaciw :D</p>
+        <p>Dan sebagai penutup (sebenarnya masih banyak yang mau aku ucapin sih, bep), aku mau minta maaf kalau aku belum jadi sosok pasangan yang kamu idam-idamkan. Namun insyaa Allah aku akan selalu berusaha semaksimal mungkin menjadi pasangan yang layak mendampingi kamu; bikin kamu bahagia dan orang tuamu tenang untuk menitipkan anak tercintanya kepadaku. Bismillah ya, bep…</p>
+        <p class="signature">Dari, insyaa Allah <strong>Calon Suami Idaman</strong> Rahmi Hidayati Daulati Sauroh   <strong>Aamiin Allahumma</strong><br>~ <strong>Muhamad Nafis</strong></p>
+      </article>
+    </div>
+  </dialog>
+
+  <!-- Audio (ganti src dengan file mp3 kamu di Replit) -->
+  <audio id="bgm" loop preload="auto" autoplay>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <footer>
+    Dibuat dengan ❤️ oleh Nafis   2025
+  </footer>
+
+  <script>
+    // Typewriter for subtitle
+    const words = [
+      'Today is your day, my lovely. ✨',
+      'Selamat ulang tahun ke-25, Bep! 🎂',
+      'Barakallah Fii Umrik. 🤲',
+    ];
+    const typeEl = document.getElementById('type');
+    let wi=0, ci=0;
+    function tick(){
+      const w = words[wi];
+      typeEl.textContent = w.slice(0, ++ci);
+      if(ci<=w.length){ setTimeout(tick, 48); }
+      else { setTimeout(()=>{ ci=0; wi=(wi+1)%words.length; tick(); }, 1600); }
+    }
+    tick();
+
+    // Floating hearts generator
+    const heartsWrap = document.getElementById('hearts');
+    function spawnHeart(){
+      const h = document.createElement('div');
+      h.className='heart';
+      const size = 10 + Math.random()*16;
+      h.style.width=h.style.height=size+'px';
+      h.style.left = Math.random()*100+'vw';
+      h.style.bottom = '-20px';
+      h.style.opacity = 0.12 + Math.random()*0.3;
+      h.style.animationDuration = (8+Math.random()*6)+'s';
+      h.style.background = Math.random()>.6? 'var(--accent-2)': 'var(--accent)';
+      heartsWrap.appendChild(h);
+      setTimeout(()=>h.remove(), 14000);
+    }
+    setInterval(spawnHeart, 600);
+
+    // Letter modal controls
+    const openBtn = document.getElementById('open');
+    const dlg = document.getElementById('letter');
+    const closeBtn = document.getElementById('close');
+    openBtn.addEventListener('click', ()=>{ 
+      if(typeof dlg.showModal === 'function'){ dlg.showModal(); confetti(260); } else { alert('Browser tidak mendukung dialog :(') }
+      // Fallback play jika autoplay diblokir
+      const bgm = document.getElementById('bgm');
+      bgm && bgm.play && bgm.play().catch(()=>{});
+    });
+    closeBtn.addEventListener('click', ()=> dlg.close());
+
+    // Try autoplay on load (may be blocked on some devices)
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const bgm = document.getElementById('bgm');
+      if(bgm && bgm.play){ bgm.play().catch(()=>{}); }
+    });
+
+    // Simple confetti
+    const fx = document.getElementById('fx');
+    const ctx = fx.getContext('2d');
+    function size(){ fx.width = innerWidth * devicePixelRatio; fx.height = innerHeight * devicePixelRatio; }
+    size(); addEventListener('resize', size);
+    let parts=[];
+    function confetti(n=200){
+      for(let i=0;i<n;i++){
+        parts.push({
+          x: Math.random()*fx.width,
+          y: -20*Math.random()*devicePixelRatio,
+          r: 4 + Math.random()*10,
+          s: 1 + Math.random()*3,
+          a: Math.random()*Math.PI*2,
+        });
+      }
+    }
+    function step(){
+      ctx.clearRect(0,0,fx.width,fx.height);
+      ctx.save();
+      for(const p of parts){
+        p.y += p.s*2; p.x += Math.sin(p.a+=0.02)*1.5; 
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = (Math.random()>.5? '#ff6b8a':'#7c3aed');
+        ctx.globalAlpha = .85;
+        ctx.fill();
+      }
+      ctx.restore();
+      parts = parts.filter(p=>p.y < fx.height+40);
+      requestAnimationFrame(step);
+    }
+    step();
+
+    // Auto-confetti when modal scrolls to certain paragraphs
+    const highlights = [2, 7, 12]; // trigger near these paragraph indexes
+    const paras = [...document.querySelectorAll('#letter-content p')];
+    const obs = new IntersectionObserver((entries)=>{
+      for(const e of entries){ if(e.isIntersecting){ const i = paras.indexOf(e.target); if(highlights.includes(i)) confetti(80); }}
+    }, {root: document.querySelector('.modal-body'), threshold:.6});
+    paras.forEach(p=>obs.observe(p));
+  </script>
+</body>
+</html>
